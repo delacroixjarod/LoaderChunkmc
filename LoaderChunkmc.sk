@@ -1,0 +1,167 @@
+options:
+	Prefix: &e&lChunk&6&lLoader &f» &e
+	Pas: 200
+	Y_coordinate: 120
+	Postion_native: true
+	Temps_attente: 2
+	Permission: chunk.use
+	
+command /chunk [<text>] [<text>]:
+	permission: {@Permission}
+	trigger:
+		if arg 1 isn't set:
+			send " " to player
+			send "&6&lFait par &e&lbleu40 &f| &6&lVersion &e&l1.0" to player
+			send " " to player
+			send "&6&lAide pour le /chunk"
+			send " " to player
+			send "&f» &e/chunk start <nbr de chunk> &f> Charge les chunks" to player
+			send "&f» &e/chunk stop &f> Arrête le chargement" to player
+			send " " to player
+			stop
+		if arg 1 isn't "start" or "stop":
+			send " " to player
+			send "&6&lFait par &e&lbleu40 &f| &6&lVersion &e&l1.0" to player
+			send " " to player
+			send "&6&lAide pour le /chunk"
+			send " " to player
+			send "&f» &e/chunk start <nbr de chunk> &f> Charge les chunks" to player
+			send "&f» &e/chunk stop &f> Arrête le chargement" to player
+			send " " to player
+			stop
+		if arg 1 is "start":
+			if arg 2 is set:
+				if {chunck.load} is set:
+					send "{@Prefix}&c&lUn chargement est déjà en cours !"
+					stop
+					
+				set {_nbr} to arg-2 parsed as an integer
+				set {actions} to 0
+				set {_startpos} to 0
+				set {globalchunk} to 0
+				
+				if {@Postion_native} is true:
+					make console execute command "/tp %player% %player%"
+					set {_x} to player's x-coordinate 
+					set {_z} to player's z-coordinate
+				
+				set {_step1} to 1
+				set {_step2} to 2
+				set {_step3} to 2
+				set {_step4} to 2
+				set {_step5} to 1
+				
+				set {chunkx} to 0
+				set {chunkz} to 0
+				set {chunck.load} to true
+				
+				loop {_nbr} times:
+					if {chunck.load} is set:
+						add 1 to {actions}
+						add {@Pas} to {_startpos}
+						if {actions} > 1:
+							add 1 to {_step1}
+							add 2 to {_step2}
+							add 2 to {_step3}
+							add 2 to {_step4}
+							add 1 to {_step5}
+						
+						if {@Postion_native} is true:
+							make console execute command "/tp %player% %{_x}% {@Y_coordinate} %{_z}%"
+						else:
+							make console execute command "/tp %player% 0 {@Y_coordinate} 0"
+						wait 3 seconds
+						make console execute command "/tp %player% ~%{_startpos}% {@Y_coordinate} ~0"
+						make player execute command "/§chunkinfo"
+						send player title "&a&l%{actions}% cycles" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+						wait 3 seconds
+						
+						loop {_step1} times:
+							if {chunck.load} isn't set:
+								stop loop
+							add 1 to {chunkz}
+							add 256 to {globalchunk}
+							make console execute command "/tp %player% ~0 {@Y_coordinate} ~{@Pas}"
+							make player execute command "/§chunkinfo"
+							send player title "&0" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+							wait {@Temps_attente} seconds
+							
+						loop {_step2} times:
+							if {chunck.load} isn't set:
+								stop loop
+							remove 1 from {chunkx}
+							add 128 to {globalchunk}
+							make console execute command "/tp %player% ~-{@Pas} {@Y_coordinate} ~0"
+							make player execute command "/§chunkinfo"
+							send player title "&0" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+							wait {@Temps_attente} seconds
+							
+						loop {_step3} times:
+							if {chunck.load} isn't set:
+								stop loop
+							remove 1 from {chunkz}
+							add 128 to {globalchunk}
+							make console execute command "/tp %player% ~0 {@Y_coordinate} ~-{@Pas}"
+							make player execute command "/§chunkinfo"
+							send player title "&0" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+							wait {@Temps_attente} seconds
+						
+						loop {_step4} times:
+							if {chunck.load} isn't set:
+								stop loop
+							add 1 to {chunkx}
+							add 128 to {globalchunk}
+							make console execute command "/tp %player% ~{@Pas} {@Y_coordinate} ~0"
+							make player execute command "/§chunkinfo"
+							send player title "&0" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+							wait {@Temps_attente} seconds
+
+						loop {_step5} times:
+							if {chunck.load} isn't set:
+								stop loop
+							add 1 to {chunkz}
+							add 128 to {globalchunk}
+							make console execute command "/tp %player% ~0 {@Y_coordinate} ~{@Pas}"
+							make player execute command "/§chunkinfo"
+							send player title "&0" with subtitle "&b&lChunk X &r: &3&l%{chunkx}% &f| &b&lChunk Z &r: &3&l%{chunkz}%" for 5 seconds
+							wait {@Temps_attente} seconds
+						
+					else:
+						send "{@Prefix}&a&lArrêt du chargement des chunks..."
+						stop loop
+				
+				delete {chunck.load}
+				send "{@Prefix}&a&lChargement terminé ;)" to player
+				wait 1 second
+				send "{@Prefix}&2&lVoici un récapitulatif de ce chargement:" to player
+				send " " to player
+				send " - &a%{actions}% Cycles réalisés" to player
+				send " - &a~ %{globalchunk}% Chunks chargés" to player
+				send " " to player
+				wait 10 second
+				wipe player's sidebar
+				stop
+			else:
+				send "{@Prefix}Veuillez précisé le rayon de chunk à charger." to player
+				
+		if arg 1 is "stop":
+			if {chunck.load} isn't set:
+				send "{@Prefix}Aucun chargement est en cours" to player
+				stop
+			else:
+				send "{@Prefix}&a&lArrêt du chargement des chunks..." to player
+				delete {chunck.load}
+				stop
+
+command /§chunkinfo:
+	trigger:
+		wipe player's sidebar
+		set name of sidebar of player to "&b&lChunk's Info"
+		set score "&0" in sidebar of player to 6
+		set score "&7» &6Cycles réalisés&r: &e&l%{actions}%" in sidebar of player to 5
+		set score "&7» &6Chunks chargés&r: &e&l%{globalchunk}%" in sidebar of player to 4
+		set score "&e" in sidebar of player to 3
+		set score "&7» &b&lPosition actuelle:" in sidebar of player to 2
+		set score "    -&6Chunk X&r: &e&l%{chunkx}%" in sidebar of player to 1
+		set score "    -&6Chunk Z&r: &e&l%{chunkz}%" in sidebar of player to 0
+		stop
