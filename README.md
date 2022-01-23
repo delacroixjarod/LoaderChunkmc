@@ -1,2 +1,0 @@
-# LoaderChunkmc
-Skript LoaderChunkmc
